@@ -3,399 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>森林拔河大對抗 - 語文遊戲</title>
+    <title>漢字拔河大賽 - 易混淆字挑戰</title>
     <style>
         :root {
-            --dolphin-color: #00d2ff;
+            --dolphin-color: #00a8ff;
             --cat-color: #ff9f43;
-            --sky-blue: #87CEEB;
-            --grass-green: #2ecc71;
+            --rope-color: #8c7e6a;
         }
-
         body {
             font-family: "Microsoft JhengHei", sans-serif;
             margin: 0;
-            padding: 0;
-            overflow: hidden;
+            background: #f0f2f5;
             display: flex;
             flex-direction: column;
             align-items: center;
             height: 100vh;
-            background: var(--sky-blue);
-            touch-action: manipulation;
+            overflow: hidden;
+            user-select: none;
         }
-
-        /* 風景裝飾：雲朵動畫 */
-        .cloud {
-            position: absolute;
-            background: white;
-            border-radius: 50px;
-            opacity: 0.8;
-            z-index: 1;
-            animation: cloudMove linear infinite;
-        }
-        .cloud::after, .cloud::before {
-            content: '';
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-        }
-        .c1 { width: 100px; height: 40px; top: 10%; left: -150px; animation-duration: 25s; }
-        .c2 { width: 150px; height: 60px; top: 25%; left: -200px; animation-duration: 40s; animation-delay: 5s; }
-        
-        @keyframes cloudMove {
-            from { transform: translateX(0vw); }
-            to { transform: translateX(120vw); }
-        }
-
-        /* 森林地面 */
-        .landscape {
-            position: absolute;
-            bottom: 0;
+        /* 拔河場景區 */
+        #game-stage {
             width: 100%;
-            height: 40vh;
-            background: linear-gradient(to top, #27ae60 0%, #2ecc71 100%);
-            z-index: 2;
-            border-top: 5px solid #1e8449;
-        }
-
-        /* 頂部看板 */
-        #header {
+            height: 300px;
+            background: #fff;
             position: relative;
-            z-index: 10;
-            width: 90%;
-            max-width: 1000px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            margin-top: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.3);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
-        }
-
-        .score-box {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        #timer-circle {
-            background: #ff7675;
-            color: white;
-            padding: 8px 25px;
-            border-radius: 30px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-
-        /* 拔河核心區 */
-        #tug-arena {
-            position: relative;
-            z-index: 5;
-            width: 100%;
-            height: 250px;
+            border-bottom: 5px solid #ddd;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        #rope {
-            width: 100vw;
-            height: 16px;
-            background: repeating-linear-gradient(45deg, #f39c12, #f39c12 10px, #e67e22 10px, #e67e22 20px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            position: relative;
-            display: flex;
-            align-items: center;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .flag {
-            width: 4px;
-            height: 80px;
-            background: #ff4757;
-            margin: 0 auto;
-            border: 2px solid white;
-        }
-
-        .character {
+        .team-icon {
             font-size: 80px;
             position: absolute;
-            top: -90px;
-            filter: drop-shadow(0 10px 5px rgba(0,0,0,0.2));
+            transition: all 0.5s ease;
+            z-index: 10;
+        }
+        #dolphin-team { left: 5%; }
+        #cat-team { right: 5%; }
+        
+        #rope {
+            width: 80%;
+            height: 15px;
+            background: var(--rope-color);
+            position: relative;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #knot {
+            width: 30px;
+            height: 50px;
+            background: #ff0000;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: left 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
         }
 
-        #p1-char { left: 15%; transform: scaleX(-1); }
-        #p2-char { right: 15%; }
+        /* 資訊列 */
+        #info-bar {
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            background: #333;
+            color: white;
+            font-size: 1.2rem;
+        }
 
-        /* 題目顯示與操作 */
-        #ui-layer {
-            position: relative;
-            z-index: 10;
-            flex: 1;
-            width: 95%;
-            max-width: 900px;
+        /* 題目顯示區 */
+        #question-container {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
-
-        #question-display {
-            background: rgba(255, 255, 255, 0.9);
-            width: 90%;
-            padding: 25px;
-            border-radius: 25px;
-            font-size: 2.2rem;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            margin-bottom: 25px;
-            color: #2d3436;
-            border-bottom: 5px solid #dfe6e9;
-        }
-
-        .battle-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
             width: 100%;
+            padding: 20px;
+        }
+        #question-text {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+            text-align: center;
         }
 
-        .team-card {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(5px);
-            padding: 15px;
-            border-radius: 20px;
-            border: 2px solid rgba(255,255,255,0.4);
+        /* 按鈕互動區 */
+        #controls {
+            display: flex;
+            width: 100%;
+            height: 250px;
+            gap: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .control-side {
+            flex: 1;
             display: flex;
             flex-direction: column;
             gap: 15px;
-        }
-
-        .btn-ans {
-            padding: 20px;
-            font-size: 1.8rem;
-            font-weight: bold;
-            border: none;
+            padding: 15px;
             border-radius: 15px;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+            border: 3px dashed #ccc;
         }
-
-        .btn-p1 { background: var(--dolphin-color); color: white; }
-        .btn-p2 { background: var(--cat-color); color: white; }
-
-        .btn-ans:active { transform: translateY(4px); box-shadow: none; }
-
-        /* 結束與開始 */
-        .overlay {
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-        }
-
-        .start-play-btn {
-            padding: 20px 60px;
-            font-size: 2rem;
-            background: #2ecc71;
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: 0.3s;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="cloud c1"></div>
-    <div class="cloud c2"></div>
-    <div class="landscape"></div>
-
-    <div id="start-screen" class="overlay">
-        <h1 style="font-size: 3.5rem; margin-bottom: 0;">🌳 森林拔河大賽</h1>
-        <p style="font-size: 1.5rem; opacity: 0.9;">選出正確的字，把繩子拉過來！</p>
-        <div style="margin: 20px; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
-            <p>🐬 海豚隊：按鍵 A / D</p>
-            <p>🐱 小貓隊：按鍵 ← / →</p>
-        </div>
-        <button class="start-play-btn" onclick="beginGame()">開始對決</button>
-    </div>
-
-    <div id="header">
-        <div class="score-box" style="color: var(--dolphin-color)">🐬 <span id="p1-score">0</span></div>
-        <div id="timer-circle">⏳ <span id="timer-txt">90</span>s</div>
-        <div class="score-box" style="color: var(--cat-color)"><span id="p2-score">0</span> 🐱</div>
-    </div>
-
-    <div id="tug-arena">
-        <div id="rope">
-            <div id="p1-char" class="character">🐬</div>
-            <div class="flag"></div>
-            <div id="p2-char" class="character">🐱</div>
-        </div>
-    </div>
-
-    <div id="ui-layer">
-        <div id="question-display">準備比賽...</div>
+        .dolphin-side { background: #e3f2fd; border-color: var(--dolphin-color); }
+        .cat-side { background: #fff3e0; border-color: var(--cat-color); }
         
-        <div class="battle-grid">
-            <div class="team-card">
-                <div style="color:white; font-weight:bold;">海豚隊</div>
-                <button class="btn-ans btn-p1" onclick="submitAns(0, 'p1')">A</button>
-                <button class="btn-ans btn-p1" onclick="submitAns(1, 'p1')">B</button>
-            </div>
-            <div class="team-card">
-                <div style="color:white; font-weight:bold; text-align:right;">小貓隊</div>
-                <button class="btn-ans btn-p2" onclick="submitAns(0, 'p2')">A</button>
-                <button class="btn-ans btn-p2" onclick="submitAns(1, 'p2')">B</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        const quizData = [
-            { q: "這件事情還（__）完成。", opt: ["未", "末"], ans: 0 },
-            { q: "這是一年之（__）。", opt: ["未", "末"], ans: 1 },
-            { q: "他是一位勇敢的（__）兵。", opt: ["士", "土"], ans: 0 },
-            { q: "地上有很多（__）。", opt: ["士", "土"], ans: 1 },
-            { q: "我（__）經吃飽了。", opt: ["已", "己"], ans: 0 },
-            { q: "請先做好自（__）管理。", opt: ["已", "己"], ans: 1 },
-            { q: "今（__）天氣很好。", opt: ["日", "曰"], ans: 0 },
-            { q: "孔子（__）：「學而時習之。」", opt: ["日", "曰"], ans: 1 },
-            { q: "有一個（__）走進教室。", opt: ["人", "入"], ans: 0 },
-            { q: "請（__）內坐。", opt: ["人", "入"], ans: 1 },
-            { q: "他用（__）切水果。", opt: ["刀", "力"], ans: 0 },
-            { q: "做事情要用（__）氣。", opt: ["刀", "力"], ans: 1 },
-            { q: "他有一（__）元。", opt: ["千", "干"], ans: 0 },
-            { q: "不要隨便（__）涉別人。", opt: ["千", "干"], ans: 1 },
-            { q: "這是一棵大（__）。", opt: ["木", "本"], ans: 0 },
-            { q: "這（__）書很好看。", opt: ["木", "本"], ans: 1 },
-            { q: "他長得很（__）高了。", opt: ["大", "太"], ans: 0 },
-            { q: "今天（__）陽很大。", opt: ["大", "太"], ans: 1 },
-            { q: "今（__）是星期五。", opt: ["天", "夭"], ans: 0 },
-            { q: "小狗不幸（__）折。", opt: ["天", "夭"], ans: 1 },
-            { q: "農夫在放（__）。", opt: ["牛", "午"], ans: 0 },
-            { q: "中（__）休息時間到了。", opt: ["牛", "午"], ans: 1 },
-            { q: "他是國（__）。", opt: ["王", "玉"], ans: 0 },
-            { q: "這塊（__）很漂亮。", opt: ["王", "玉"], ans: 1 },
-            { q: "他的頭髮很（__）。", opt: ["白", "百"], ans: 0 },
-            { q: "他活到一（__）歲。", opt: ["白", "百"], ans: 1 },
-            { q: "請用眼（__）看。", opt: ["目", "自"], ans: 0 },
-            { q: "請（__）己完成作業。", opt: ["目", "自"], ans: 1 },
-            { q: "他用（__）拿東西。", opt: ["手", "毛"], ans: 0 },
-            { q: "小狗身上有很多（__）。", opt: ["手", "毛"], ans: 1 }
-        ];
-
-        let questions = [];
-        let curIdx = 0;
-        let p1Score = 0;
-        let p2Score = 0;
-        let timer = 90;
-        let offset = 0;
-        let isPlaying = false;
-        let clock;
-
-        function shuffle(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
+        .side-label {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
         }
 
-        function beginGame() {
-            questions = shuffle([...quizData]);
-            curIdx = 0; p1Score = 0; p2Score = 0; offset = 0; timer = 90;
-            isPlaying = true;
-            document.getElementById('start-screen').style.display = 'none';
-            refreshUI();
-            startTimer();
-            showNext();
-        }
-
-        function showNext() {
-            if (curIdx >= questions.length) return finish();
-            const q = questions[curIdx];
-            document.getElementById('question-display').innerText = q.q;
-            const btns = document.querySelectorAll('.btn-ans');
-            btns[0].innerText = q.opt[0]; btns[1].innerText = q.opt[1];
-            btns[2].innerText = q.opt[0]; btns[3].innerText = q.opt[1];
-        }
-
-        function submitAns(choice, player) {
-            if (!isPlaying) return;
-            const correct = questions[curIdx].ans;
-            const hit = (choice === correct);
-
-            if (player === 'p1') {
-                if (hit) { p1Score++; offset -= 50; } else { offset += 30; }
-            } else {
-                if (hit) { p2Score++; offset += 50; } else { offset -= 30; }
-            }
-
-            refreshUI();
-            curIdx++;
-            showNext();
-        }
-
-        function refreshUI() {
-            document.getElementById('p1-score').innerText = p1Score;
-            document.getElementById('p2-score').innerText = p2Score;
-            // 限制繩子範圍
-            const limit = window.innerWidth / 2 - 100;
-            if (offset < -limit) offset = -limit;
-            if (offset > limit) offset = limit;
-            document.getElementById('rope').style.transform = `translateX(${offset}px)`;
-        }
-
-        function startTimer() {
-            clock = setInterval(() => {
-                timer--;
-                document.getElementById('timer-txt').innerText = timer;
-                if (timer <= 0) finish();
-            }, 1000);
-        }
-
-        function finish() {
-            isPlaying = false;
-            clearInterval(clock);
-            const msg = p1Score > p2Score ? "🐬 海豚隊 贏了！" : (p2Score > p1Score ? "🐱 小貓隊 贏了！" : "打成平手！");
-            const screen = document.getElementById('start-screen');
-            screen.innerHTML = `
-                <h1 style="font-size:3rem;">比賽結束</h1>
-                <h2 style="color:#f1c40f;">${msg}</h2>
-                <div style="font-size:1.5rem; margin:20px;">
-                    海豚隊: ${p1Score} 分 | 小貓隊: ${p2Score} 分
-                </div>
-                <button class="start-play-btn" onclick="location.reload()">重新挑戰</button>
-            `;
-            screen.style.display = 'flex';
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (!isPlaying) return;
-            const key = e.key.toLowerCase();
-            if (key === 'a') submitAns(0, 'p1');
-            if (key === 'd') submitAns(1, 'p1');
-            if (key === 'arrowleft') submitAns(0, 'p2');
-            if (key === 'arrowright') submitAns(1, 'p2');
-        });
-    </script>
-</body>
-</html>
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1
